@@ -1,0 +1,761 @@
+[{
+  "_id": {
+    "$oid": "68748897967882fa06fb60c1"
+  },
+  "name": "sistem_informasi_akademik",
+  "entities": [
+    {
+      "name": "Mahasiswa",
+      "attributes": [
+        "NIM",
+        "Nama",
+        "Jurusan",
+        "Email"
+      ],
+      "primary_key": "NIM"
+    },
+    {
+      "name": "KHS",
+      "attributes": [
+        "IDKHS",
+        "Semester",
+        "Tahun Ajaran"
+      ],
+      "primary_key": "IDKHS",
+      "foreign_keys": [
+        {
+          "name": "NIM",
+          "references": "Mahasiswa(NIM)"
+        },
+        {
+          "name": "KodeMK",
+          "references": "Mata_Kuliah(KodeMK)"
+        }
+      ]
+    },
+    {
+      "name": "Dosen",
+      "attributes": [
+        "NIP",
+        "Nama",
+        "Alamat",
+        "Jabatan"
+      ],
+      "primary_key": "NIP"
+    },
+    {
+      "name": "Mata_Kuliah",
+      "attributes": [
+        "KodeMK",
+        "SKS",
+        "NamaMK"
+      ],
+      "primary_key": "KodeMK",
+      "foreign_keys": [
+        {
+          "name": "NIP",
+          "references": "Dosen(NIP)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Mahasiswa",
+      "entity2": "KHS",
+      "relation": "memiliki",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Mata_Kuliah",
+      "entity2": "KHS",
+      "relation": "tercantum di",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Dosen",
+      "entity2": "Mata_Kuliah",
+      "relation": "mengajar",
+      "type": "one-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "68749d027095cb2221893054"
+  },
+  "name": "perpustakaan",
+  "entities": [
+    {
+      "name": "Buku",
+      "attributes": [
+        "IDBuku",
+        "Judul",
+        "Pengarang",
+        "TahunTerbit"
+      ],
+      "primary_key": "IDBuku"
+    },
+    {
+      "name": "Anggota",
+      "attributes": [
+        "IDAnggota",
+        "Nama",
+        "Alamat",
+        "TanggalDaftar"
+      ],
+      "primary_key": "IDAnggota"
+    },
+    {
+      "name": "Peminjaman",
+      "attributes": [
+        "IDPeminjaman",
+        "TanggalPinjam",
+        "TanggalKembali",
+        "IDAnggota"
+      ],
+      "primary_key": "IDPeminjaman",
+      "foreign_keys": [
+        {
+          "name": "IDAnggota",
+          "references": "Anggota(IDAnggota)"
+        }
+      ]
+    },
+    {
+      "name": "Peminjaman_Buku",
+      "attributes": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "primary_key": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "foreign_keys": [
+        {
+          "name": "IDPeminjaman",
+          "references": "Peminjaman(IDPeminjaman)"
+        },
+        {
+          "name": "IDBuku",
+          "references": "Buku(IDBuku)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Anggota",
+      "entity2": "Peminjaman",
+      "relation": "melakukan",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Peminjaman",
+      "entity2": "Buku",
+      "relation": "meminjam",
+      "type": "many-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894baacbf1028575a9c55f5"
+  },
+  "name": "perpustakaan_nasional",
+  "entities": [
+    {
+      "name": "Buku",
+      "attributes": [
+        "IDBuku",
+        "Judul",
+        "Pengarang",
+        "ISBN",
+        "TahunTerbit",
+        "Kategori"
+      ],
+      "primary_key": "IDBuku"
+    },
+    {
+      "name": "Anggota",
+      "attributes": [
+        "IDAnggota",
+        "Nama",
+        "Alamat",
+        "JenisKeanggotaan",
+        "TanggalGabung"
+      ],
+      "primary_key": "IDAnggota"
+    },
+    {
+      "name": "Peminjaman",
+      "attributes": [
+        "IDPeminjaman",
+        "TanggalPinjam",
+        "TanggalKembali",
+        "IDAnggota"
+      ],
+      "primary_key": "IDPeminjaman",
+      "foreign_keys": [
+        {
+          "name": "IDAnggota",
+          "references": "Anggota(IDAnggota)"
+        }
+      ]
+    },
+    {
+      "name": "Peminjaman_Buku",
+      "attributes": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "primary_key": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "foreign_keys": [
+        {
+          "name": "IDPeminjaman",
+          "references": "Peminjaman(IDPeminjaman)"
+        },
+        {
+          "name": "IDBuku",
+          "references": "Buku(IDBuku)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Anggota",
+      "entity2": "Peminjaman",
+      "relation": "melakukan",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Peminjaman",
+      "entity2": "Buku",
+      "relation": "meminjam",
+      "type": "many-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894bacabf1028575a9c55f7"
+  },
+  "name": "perpustakaan_kampus",
+  "entities": [
+    {
+      "name": "Mahasiswa",
+      "attributes": [
+        "NIM",
+        "Nama",
+        "Fakultas",
+        "Prodi",
+        "TahunMasuk"
+      ],
+      "primary_key": "NIM"
+    },
+    {
+      "name": "Buku",
+      "attributes": [
+        "IDBuku",
+        "Judul",
+        "Pengarang",
+        "Penerbit",
+        "TahunTerbit",
+        "Kategori"
+      ],
+      "primary_key": "IDBuku"
+    },
+    {
+      "name": "Peminjaman",
+      "attributes": [
+        "IDPeminjaman",
+        "TanggalPinjam",
+        "TanggalKembali",
+        "NIM"
+      ],
+      "primary_key": "IDPeminjaman",
+      "foreign_keys": [
+        {
+          "name": "NIM",
+          "references": "Mahasiswa(NIM)"
+        }
+      ]
+    },
+    {
+      "name": "DetailPeminjaman",
+      "attributes": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "primary_key": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "foreign_keys": [
+        {
+          "name": "IDPeminjaman",
+          "references": "Peminjaman(IDPeminjaman)"
+        },
+        {
+          "name": "IDBuku",
+          "references": "Buku(IDBuku)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Mahasiswa",
+      "entity2": "Peminjaman",
+      "relation": "meminjamkan",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Peminjaman",
+      "entity2": "Buku",
+      "relation": "berisi",
+      "type": "many-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894bae5bf1028575a9c55f9"
+  },
+  "name": "perpustakaan_sekolah",
+  "entities": [
+    {
+      "name": "Siswa",
+      "attributes": [
+        "NIS",
+        "Nama",
+        "Kelas",
+        "Jurusan"
+      ],
+      "primary_key": "NIS"
+    },
+    {
+      "name": "Buku",
+      "attributes": [
+        "IDBuku",
+        "Judul",
+        "Pengarang",
+        "TahunTerbit",
+        "JenisBuku"
+      ],
+      "primary_key": "IDBuku"
+    },
+    {
+      "name": "Peminjaman",
+      "attributes": [
+        "IDPeminjaman",
+        "TanggalPinjam",
+        "TanggalKembali",
+        "NIS"
+      ],
+      "primary_key": "IDPeminjaman",
+      "foreign_keys": [
+        {
+          "name": "NIS",
+          "references": "Siswa(NIS)"
+        }
+      ]
+    },
+    {
+      "name": "DetailPinjam",
+      "attributes": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "primary_key": [
+        "IDPeminjaman",
+        "IDBuku"
+      ],
+      "foreign_keys": [
+        {
+          "name": "IDPeminjaman",
+          "references": "Peminjaman(IDPeminjaman)"
+        },
+        {
+          "name": "IDBuku",
+          "references": "Buku(IDBuku)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Siswa",
+      "entity2": "Peminjaman",
+      "relation": "melakukan",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Peminjaman",
+      "entity2": "Buku",
+      "relation": "berisi",
+      "type": "many-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894bb25bf1028575a9c55fb"
+  },
+  "name": "rumah_sakit",
+  "entities": [
+    {
+      "name": "Pasien",
+      "attributes": [
+        "IDPasien",
+        "Nama",
+        "TanggalLahir",
+        "Alamat",
+        "JenisKelamin"
+      ],
+      "primary_key": "IDPasien"
+    },
+    {
+      "name": "Dokter",
+      "attributes": [
+        "IDDokter",
+        "Nama",
+        "Spesialis",
+        "NoSTR"
+      ],
+      "primary_key": "IDDokter"
+    },
+    {
+      "name": "Kunjungan",
+      "attributes": [
+        "IDKunjungan",
+        "Tanggal",
+        "IDPasien",
+        "IDDokter",
+        "Diagnosa"
+      ],
+      "primary_key": "IDKunjungan",
+      "foreign_keys": [
+        {
+          "name": "IDPasien",
+          "references": "Pasien(IDPasien)"
+        },
+        {
+          "name": "IDDokter",
+          "references": "Dokter(IDDokter)"
+        }
+      ]
+    },
+    {
+      "name": "Obat",
+      "attributes": [
+        "IDObat",
+        "NamaObat",
+        "Dosis",
+        "Harga"
+      ],
+      "primary_key": "IDObat"
+    },
+    {
+      "name": "Resep",
+      "attributes": [
+        "IDKunjungan",
+        "IDObat",
+        "Jumlah"
+      ],
+      "primary_key": [
+        "IDKunjungan",
+        "IDObat"
+      ],
+      "foreign_keys": [
+        {
+          "name": "IDKunjungan",
+          "references": "Kunjungan(IDKunjungan)"
+        },
+        {
+          "name": "IDObat",
+          "references": "Obat(IDObat)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Pasien",
+      "entity2": "Kunjungan",
+      "relation": "melakukan",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Dokter",
+      "entity2": "Kunjungan",
+      "relation": "menangani",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Kunjungan",
+      "entity2": "Obat",
+      "relation": "diresepkan",
+      "type": "many-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894bb95bf1028575a9c55fd"
+  },
+  "name": "puskesmas",
+  "entities": [
+    {
+      "name": "Pasien",
+      "attributes": [
+        "IDPasien",
+        "Nama",
+        "NIK",
+        "Alamat",
+        "JenisKelamin"
+      ],
+      "primary_key": "IDPasien"
+    },
+    {
+      "name": "Layanan",
+      "attributes": [
+        "IDLayanan",
+        "NamaLayanan",
+        "JenisLayanan"
+      ],
+      "primary_key": "IDLayanan"
+    },
+    {
+      "name": "Kunjungan",
+      "attributes": [
+        "IDKunjungan",
+        "IDPasien",
+        "IDLayanan",
+        "Tanggal",
+        "Catatan"
+      ],
+      "primary_key": "IDKunjungan",
+      "foreign_keys": [
+        {
+          "name": "IDPasien",
+          "references": "Pasien(IDPasien)"
+        },
+        {
+          "name": "IDLayanan",
+          "references": "Layanan(IDLayanan)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Pasien",
+      "entity2": "Kunjungan",
+      "relation": "mengunjungi",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Layanan",
+      "entity2": "Kunjungan",
+      "relation": "diberikan_dalam",
+      "type": "one-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894bbb4bf1028575a9c55ff"
+  },
+  "name": "posyandu",
+  "entities": [
+    {
+      "name": "Balita",
+      "attributes": [
+        "IDBalita",
+        "Nama",
+        "TanggalLahir",
+        "JenisKelamin",
+        "NamaOrangtua"
+      ],
+      "primary_key": "IDBalita"
+    },
+    {
+      "name": "Kegiatan",
+      "attributes": [
+        "IDKegiatan",
+        "NamaKegiatan",
+        "Tanggal",
+        "Jenis"
+      ],
+      "primary_key": "IDKegiatan"
+    },
+    {
+      "name": "Pencatatan",
+      "attributes": [
+        "IDBalita",
+        "IDKegiatan",
+        "BeratBadan",
+        "TinggiBadan",
+        "Keterangan"
+      ],
+      "primary_key": [
+        "IDBalita",
+        "IDKegiatan"
+      ],
+      "foreign_keys": [
+        {
+          "name": "IDBalita",
+          "references": "Balita(IDBalita)"
+        },
+        {
+          "name": "IDKegiatan",
+          "references": "Kegiatan(IDKegiatan)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Balita",
+      "entity2": "Kegiatan",
+      "relation": "mengikuti",
+      "type": "many-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894bbcdbf1028575a9c5601"
+  },
+  "name": "bank",
+  "entities": [
+    {
+      "name": "Nasabah",
+      "attributes": [
+        "IDNasabah",
+        "Nama",
+        "Alamat",
+        "NomorIdentitas"
+      ],
+      "primary_key": "IDNasabah"
+    },
+    {
+      "name": "Rekening",
+      "attributes": [
+        "NoRekening",
+        "JenisRekening",
+        "Saldo",
+        "IDNasabah"
+      ],
+      "primary_key": "NoRekening",
+      "foreign_keys": [
+        {
+          "name": "IDNasabah",
+          "references": "Nasabah(IDNasabah)"
+        }
+      ]
+    },
+    {
+      "name": "Transaksi",
+      "attributes": [
+        "IDTransaksi",
+        "NoRekening",
+        "Tanggal",
+        "JenisTransaksi",
+        "Jumlah"
+      ],
+      "primary_key": "IDTransaksi",
+      "foreign_keys": [
+        {
+          "name": "NoRekening",
+          "references": "Rekening(NoRekening)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Nasabah",
+      "entity2": "Rekening",
+      "relation": "memiliki",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Rekening",
+      "entity2": "Transaksi",
+      "relation": "melakukan",
+      "type": "one-to-many"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "6894bbe3bf1028575a9c5603"
+  },
+  "name": "kantor_pos",
+  "entities": [
+    {
+      "name": "Pelanggan",
+      "attributes": [
+        "IDPelanggan",
+        "Nama",
+        "Alamat",
+        "NoTelepon"
+      ],
+      "primary_key": "IDPelanggan"
+    },
+    {
+      "name": "Paket",
+      "attributes": [
+        "IDPaket",
+        "Berat",
+        "JenisPaket",
+        "Tujuan",
+        "Biaya",
+        "Status"
+      ],
+      "primary_key": "IDPaket"
+    },
+    {
+      "name": "Pengiriman",
+      "attributes": [
+        "IDPengiriman",
+        "IDPelanggan",
+        "IDPaket",
+        "TanggalKirim",
+        "TanggalTerima"
+      ],
+      "primary_key": "IDPengiriman",
+      "foreign_keys": [
+        {
+          "name": "IDPelanggan",
+          "references": "Pelanggan(IDPelanggan)"
+        },
+        {
+          "name": "IDPaket",
+          "references": "Paket(IDPaket)"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "entity1": "Pelanggan",
+      "entity2": "Pengiriman",
+      "relation": "mengirimkan",
+      "type": "one-to-many"
+    },
+    {
+      "entity1": "Paket",
+      "entity2": "Pengiriman",
+      "relation": "terkait",
+      "type": "one-to-one"
+    }
+  ]
+}]
