@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERD Generator dengan TF-IDF - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            display: flex;
+            position: relative;
+        }
+
+        .left-panel {
+            flex: 1;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .left-panel::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            top: -50px;
+            right: -50px;
+        }
+
+        .left-panel::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            bottom: -30px;
+            left: -30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            z-index: 2;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(238, 90, 36, 0.3);
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .welcome-text {
+            z-index: 2;
+            max-width: 300px;
+        }
+
+        .welcome-text h2 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .welcome-text p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .right-panel {
+            flex: 1;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-container {
+            max-width: 350px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .form-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #4facfe;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(79, 172, 254, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #4facfe;
+            border: 2px solid #4facfe;
+            margin-top: 15px;
+        }
+
+        .btn-outline:hover {
+            background: #4facfe;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            color: #95a5a6;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e1e8ed;
+            z-index: 1;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #7f8c8d;
+        }
+
+        .form-footer a {
+            color: #4facfe;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .form-footer a:hover {
+            color: #00f2fe;
+        }
+
+        /* Form switching */
+        .forms {
+            position: relative;
+        }
+
+        .form {
+            transition: all 0.5s ease;
+        }
+
+        .form.hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 400px;
+            }
+
+            .left-panel {
+                padding: 40px 20px;
+                min-height: 200px;
+            }
+
+            .logo h1 {
+                font-size: 22px;
+            }
+
+            .welcome-text h2 {
+                font-size: 24px;
+            }
+
+            .right-panel {
+                padding: 40px 20px;
+            }
+
+            .form-title {
+                font-size: 28px;
+            }
+        }
+
+        /* Animation */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container {
+            animation: slideIn 0.6s ease;
+        }
+
+        /* Success message */
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+            display: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="logo">
+                <div class="logo-icon">🎯</div>
+                <h1>ERD Generator</h1>
+            </div>
+            <div class="welcome-text">
+                <h2>Selamat Datang!</h2>
+                <p>Buat Entity Relationship Diagram dengan mudah menggunakan teknologi TF-IDF untuk analisis teks yang lebih akurat.</p>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="forms">
+                <!-- Login Form -->
+                <div class="form" id="loginForm">
+                    <div class="form-container">
+                        <h2 class="form-title">Masuk</h2>
+                        
+                        <div class="success-message" id="loginSuccess">
+                            Login berhasil! Mengarahkan ke dashboard...
+                        </div>
+                        
+                        <div class="error-message" id="loginError">
+                            Email atau password salah!
+                        </div>
+
+                        <form onsubmit="handleLogin(event)">
+                            <div class="form-group">
+                                <label for="loginEmail">Email</label>
+                                <input type="email" id="loginEmail" name="email" required placeholder="nama@email.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="loginPassword">Password</label>
+                                <input type="password" id="loginPassword" name="password" required placeholder="Masukkan password">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Masuk</button>
+                        </form>
+
+                        <div class="divider">
+                            <span>atau</span>
+                        </div>
+
+                        <button class="btn btn-outline" onclick="showRegisterForm()">Buat Akun Baru</button>
+
+                        <div class="form-footer">
+                            <a href="#" onclick="showForgotPassword()">Lupa Password?</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register Form -->
+                <div class="form hidden" id="registerForm">
+                    <div class="form-container">
+                        <h2 class="form-title">Daftar</h2>
+                        
+                        <div class="success-message" id="registerSuccess">
+                            Registrasi berhasil! Silakan login dengan akun baru Anda.
+                        </div>
+                        
+                        <div class="error-message" id="registerError">
+                            Email sudah terdaftar!
+                        </div>
+
+                        <form onsubmit="handleRegister(event)">
+                            <div class="form-group">
+                                <label for="registerName">Nama Lengkap</label>
+                                <input type="text" id="registerName" name="name" required placeholder="Nama lengkap Anda">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="registerEmail">Email</label>
+                                <input type="email" id="registerEmail" name="email" required placeholder="nama@email.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="registerPassword">Password</label>
+                                <input type="password" id="registerPassword" name="password" required placeholder="Minimal 6 karakter" minlength="6">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="confirmPassword">Konfirmasi Password</label>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Konfirmasi password">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Daftar</button>
+                        </form>
+
+                        <div class="divider">
+                            <span>atau</span>
+                        </div>
+
+                        <button class="btn btn-outline" onclick="showLoginForm()">Sudah Punya Akun?</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showLoginForm() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            clearMessages();
+        }
+
+        function showRegisterForm() {
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            clearMessages();
+        }
+
+        function clearMessages() {
+            const messages = document.querySelectorAll('.success-message, .error-message');
+            messages.forEach(msg => msg.style.display = 'none');
+        }
+
+        function showForgotPassword() {
+            alert('Fitur lupa password akan segera tersedia. Silakan hubungi administrator.');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            // Simulasi login (dalam implementasi nyata, kirim ke server)
+            if (email === 'demo@erdgenerator.com' && password === 'demo123') {
+                document.getElementById('loginSuccess').style.display = 'block';
+                document.getElementById('loginError').style.display = 'none';
+                
+                // Simulasi redirect ke dashboard
+                setTimeout(() => {
+                    alert('Berhasil login! Akan diarahkan ke dashboard ERD Generator.');
+                }, 1000);
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('loginSuccess').style.display = 'none';
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validasi password
+            if (password !== confirmPassword) {
+                document.getElementById('registerError').textContent = 'Password tidak cocok!';
+                document.getElementById('registerError').style.display = 'block';
+                document.getElementById('registerSuccess').style.display = 'none';
+                return;
+            }
+
+            // Simulasi registrasi (dalam implementasi nyata, kirim ke server)
+            if (email === 'existing@email.com') {
+                document.getElementById('registerError').textContent = 'Email sudah terdaftar!';
+                document.getElementById('registerError').style.display = 'block';
+                document.getElementById('registerSuccess').style.display = 'none';
+            } else {
+                document.getElementById('registerSuccess').style.display = 'block';
+                document.getElementById('registerError').style.display = 'none';
+                
+                // Reset form
+                document.querySelector('#registerForm form').reset();
+                
+                // Otomatis pindah ke login setelah 2 detik
+                setTimeout(() => {
+                    showLoginForm();
+                }, 2000);
+            }
+        }
+
+        // Demo credentials info
+        console.log('Demo Login Credentials:');
+        console.log('Email: demo@erdgenerator.com');
+        console.log('Password: demo123');
+    </script>
+</body>
+</html>

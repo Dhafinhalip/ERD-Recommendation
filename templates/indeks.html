@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ERD Generator dengan TF-IDF</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .search-section {
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        #userInput {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        #userInput:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .search-options {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .search-options label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .search-options input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .status.loading {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .search-results {
+            margin-top: 20px;
+        }
+        
+        .search-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .search-result-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .search-result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .search-result-card .title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+        
+        .search-result-card .title:hover {
+            color: #4CAF50;
+            text-decoration: underline;
+        }
+        
+        .search-result-card .similarity-badge {
+            background-color: #4CAF50;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        
+        .search-result-card .entities {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .search-result-card .stats {
+            font-size: 11px;
+            color: #868e96;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 2% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: #000;
+        }
+        
+        .modal-body {
+            text-align: center;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .preview-container {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .preview-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .preview-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 ERD Generator dengan TF-IDF</h1>
+        
+        <div class="search-section">
+            <form id="erdForm">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Contoh: perpustakaan, sistem akademik, penjualan, dll..."
+                        required
+                    />
+                    <button type="submit" id="searchBtn">
+                        <span id="searchBtnText">Cari ERD</span>
+                        <span id="searchSpinner" class="loading-spinner" style="display: none;"></span>
+                    </button>
+                </div>
+                
+                <div class="search-options">
+                    <label>
+                        Top K:
+                        <input type="number" id="topK" min="1" max="20" value="10">
+                    </label>
+                    <label>
+                        Min Similarity:
+                        <input type="number" id="minSimilarity" min="0" max="1" step="0.01" value="0.05">
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        <div class="results-section">
+            <div id="searchStatus"></div>
+            
+            <div class="search-results" id="searchResults" style="display: none;">
+                <h3 id="searchResultsTitle"></h3>
+                <div class="search-results-grid" id="searchResultsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for ERD Preview -->
+    <div id="erdModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Preview ERD</div>
+                <button class="close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    Memuat ERD...
+                </div>
+                <img id="modalImage" class="modal-image" style="display: none;" />
+                <div id="modalError" style="display: none; color: red;"></div>
+                <div class="modal-actions" id="modalActions" style="display: none;">
+                    <button class="btn-primary" id="fullscreenBtn">Buka Fullscreen</button>
+                    <a class="btn-secondary" id="downloadBtn" href="#" download>Unduh ERD</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentERDData = null;
+
+        function showStatus(message, type) {
+            const statusElement = document.getElementById('searchStatus');
+            statusElement.textContent = message;
+            statusElement.className = `status ${type}`;
+            statusElement.style.display = 'block';
+        }
+
+        function clearResults() {
+            document.getElementById('searchResults').style.display = 'none';
+            document.getElementById('searchResultsGrid').innerHTML = '';
+        }
+
+        function setLoadingState(isLoading) {
+            const searchBtn = document.getElementById('searchBtn');
+            const searchBtnText = document.getElementById('searchBtnText');
+            const searchSpinner = document.getElementById('searchSpinner');
+            
+            if (isLoading) {
+                searchBtn.disabled = true;
+                searchBtnText.style.display = 'none';
+                searchSpinner.style.display = 'inline-block';
+            } else {
+                searchBtn.disabled = false;
+                searchBtnText.style.display = 'inline';
+                searchSpinner.style.display = 'none';
+            }
+        }
+
+        async function searchERD(query, topK, minSimilarity) {
+            clearResults();
+            setLoadingState(true);
+            showStatus('Mencari ERD yang sesuai...', 'loading');
+            
+            try {
+                const response = await fetch('/search-erd', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        text: query,
+                        top_k: topK,
+                        min_similarity: minSimilarity
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    if (data.results.length > 0) {
+                        showStatus(
+                            `Ditemukan ${data.total_found} ERD yang sesuai dengan query: "${data.query}"`, 
+                            'success'
+                        );
+                        
+                        document.getElementById('searchResultsTitle').textContent = 
+                            `Hasil Pencarian (${data.total_found} ERD ditemukan):`;
+                        
+                        const resultsGrid = document.getElementById('searchResultsGrid');
+                        resultsGrid.innerHTML = '';
+                        
+                        data.results.forEach(result => {
+                            const card = document.createElement('div');
+                            card.className = 'search-result-card';
+                            card.innerHTML = `
+                                <div class="title" data-erd-name="${result.name.toLowerCase().replace(/ /g, '_')}">${result.name}</div>
+                                <div class="similarity-badge">
+                                    Similarity: ${result.similarity}
+                                </div>
+                                <div class="entities">
+                                    <strong>Entitas:</strong> ${result.entities.join(', ')}
+                                </div>
+                                <div class="stats">
+                                    ${result.entity_count} entitas • ${result.relationship_count} relasi
+                                </div>
+                            `;
+                            
+                            // Add click event to title
+                            const titleElement = card.querySelector('.title');
+                            titleElement.addEventListener('click', function() {
+                                const erdName = this.getAttribute('data-erd-name');
+                                showERDPreview(erdName, result.name);
+                            });
+                            
+                            resultsGrid.appendChild(card);
+                        });
+                        
+                        document.getElementById('searchResults').style.display = 'block';
+                    } else {
+                        showStatus('Tidak ditemukan ERD yang sesuai dengan query Anda. Coba kurangi nilai Min Similarity atau gunakan kata kunci yang berbeda.', 'error');
+                    }
+                    
+                } else {
+                    showStatus(data.error || 'Terjadi kesalahan saat melakukan pencarian', 'error');
+                }
+                
+            } catch (error) {
+                showStatus('Gagal menghubungi server. Periksa koneksi internet Anda.', 'error');
+                console.error('Error:', error);
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        async function showERDPreview(erdName, displayName) {
+            const modal = document.getElementById('erdModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalLoading = document.getElementById('modalLoading');
+            const modalImage = document.getElementById('modalImage');
+            const modalError = document.getElementById('modalError');
+            const modalActions = document.getElementById('modalActions');
+            
+            // Show modal
+            modal.style.display = 'block';
+            modalTitle.textContent = `Preview ERD: ${displayName}`;
+            
+            // Show loading state
+            modalLoading.style.display = 'block';
+            modalImage.style.display = 'none';
+            modalError.style.display = 'none';
+            modalActions.style.display = 'none';
+            
+            try {
+                const response = await fetch(`/generate-erd-image/${erdName}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    modalImage.src = data.erd_image;
+                    modalImage.onload = function() {
+                        modalLoading.style.display = 'none';
+                        modalImage.style.display = 'block';
+                        modalActions.style.display = 'flex';
+                        
+                        // Update download link
+                        document.getElementById('downloadBtn').href = data.download_url;
+                        
+                        // Store current ERD data
+                        currentERDData = data;
+                    };
+                } else {
+                    modalLoading.style.display = 'none';
+                    modalError.textContent = data.error || 'Gagal memuat ERD';
+                    modalError.style.display = 'block';
+                }
+                
+            } catch (error) {
+                modalLoading.style.display = 'none';
+                modalError.textContent = 'Gagal memuat ERD. Periksa koneksi internet Anda.';
+                modalError.style.display = 'block';
+                console.error('Error:', error);
+            }
+        }
+
+        function openFullscreen() {
+            if (currentERDData && currentERDData.erd_image) {
+                window.open(currentERDData.erd_image, '_blank');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('erdForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const query = document.getElementById('userInput').value.trim();
+            const topK = parseInt(document.getElementById('topK').value) || 10;
+            const minSimilarity = parseFloat(document.getElementById('minSimilarity').value) || 0.05;
+            
+            if (!query) return;
+            
+            searchERD(query, topK, minSimilarity);
+        });
+
+        // Modal event listeners
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('erdModal').style.display = 'none';
+        });
+
+        document.getElementById('fullscreenBtn').addEventListener('click', openFullscreen);
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('erdModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Auto-focus input on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('userInput').focus();
+        });
+
+        // Handle Enter key in input
+        document.getElementById('userInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                document.getElementById('erdForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>
