@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ERD Generator dengan TF-IDF</title>
+    
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 ERD Generator dengan TF-IDF</h1>
+        
+        <div class="search-section">
+            <form id="erdForm">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="userInput"
+                        placeholder="Contoh: perpustakaan, sistem akademik, penjualan, dll..."
+                        required
+                    />
+                    <button type="submit" id="searchBtn">
+                        <span id="searchBtnText">Cari ERD</span>
+                        <span id="searchSpinner" class="loading-spinner" style="display: none;"></span>
+                    </button>
+                </div>
+                
+                <div class="search-options">
+                    <label>
+                        Top K:
+                        <input type="number" id="topK" min="1" max="20" value="10">
+                    </label>
+                    <label>
+                        Min Similarity:
+                        <input type="number" id="minSimilarity" min="0" max="1" step="0.01" value="0.05">
+                    </label>
+                </div>
+            </form>
+        </div>
+
+        <div class="results-section">
+            <div id="searchStatus"></div>
+            
+            <div class="search-results" id="searchResults" style="display: none;">
+                <h3 id="searchResultsTitle"></h3>
+                <div class="search-results-grid" id="searchResultsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for ERD Preview -->
+    <div id="erdModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Preview ERD</div>
+                <button class="close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    Memuat ERD...
+                </div>
+                <img id="modalImage" class="modal-image" style="display: none;" />
+                <div id="modalError" style="display: none; color: red;"></div>
+                <div class="modal-actions" id="modalActions" style="display: none;">
+                    <button class="btn-primary" id="fullscreenBtn">Buka Fullscreen</button>
+                    <a class="btn-secondary" id="downloadBtn" href="#" download>Unduh ERD</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+</body>
+</html>

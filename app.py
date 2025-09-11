@@ -43,14 +43,6 @@ def normalize_erd_name(erd_name):
 def find_erd_by_name(name):
     return collection.find_one({"name": normalize_erd_name(name)})
 
-# Fungsi untuk menyimpan ERD ke MongoDB
-def save_erd_to_mongo(erd):
-    erd["name"] = normalize_erd_name(erd["name"])
-    if not find_erd_by_name(erd["name"]):
-        collection.insert_one(erd)
-        # Reload sistem rekomendasi setelah menambah data baru
-        recommendation_system.load_and_process_erds()
-
 # Fungsi untuk generate gambar ERD dengan standar visualisasi yang benar
 def generate_erd_image(erd_name, erd):
     dot = graphviz.Digraph(format='png')
@@ -210,11 +202,25 @@ def search_erd():
         "total_found": len(results)
     })
 
-@app.route("/add-erd", methods=['POST'])
-def add_erd():
+
+# Handler to render the ERD adder form
+@app.route("/erd-adder", methods=["GET"])
+def erd_adder_form():
+    return render_template("erd-adder.html")
+
+# Handler to receive ERD add requests (AJAX from form)
+@app.route("/erd-adder", methods=['POST'])
+def erd_adder_submit():
     data = request.json
     if "name" not in data or "entities" not in data or "relationships" not in data:
         return jsonify({"error": "Data tidak lengkap"}), 400
+
+    def save_erd_to_mongo(erd):
+        erd["name"] = normalize_erd_name(erd["name"])
+        if not find_erd_by_name(erd["name"]):
+            collection.insert_one(erd)
+            # Reload sistem rekomendasi setelah menambah data baru
+            recommendation_system.load_and_process_erds()
 
     save_erd_to_mongo(data)
     return jsonify({"message": "ERD berhasil disimpan"}), 201
@@ -236,9 +242,21 @@ def reload_system():
     except Exception as e:
         return jsonify({"error": f"Gagal reload sistem: {str(e)}"}), 500
 
+
+# User dashboard (default)
+@app.route("/user")
+def user_dashboard():
+    return render_template("index_user.html")
+
+# Advisor dashboard
+@app.route("/advisor")
+def advisor_dashboard():
+    return render_template("index_advisor.html")
+
+# Default home redirects to user dashboard for now
 @app.route("/")
 def home():
-    return render_template("indeks.html", erd_image=url_for('static', filename=erd_filename))
+    return render_template("index_user.html", erd_image=url_for('static', filename=erd_filename))
 
 if __name__ == '__main__':
     # Pastikan folder static ada
